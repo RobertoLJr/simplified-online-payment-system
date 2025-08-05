@@ -6,17 +6,17 @@ public interface UserService {
 
     UserResponseDTO createUser(UserCreateDTO dto);
 
-    UserResponseDTO getUserById(Long id);
+    UserResponseDTO findUserById(Long id);
 
-    UserResponseDTO getUserByEmail(String email);
+    UserResponseDTO findUserByEmail(String email);
 
-    UserResponseDTO getUserByDocumentNumber(String documentNumber);
+    UserResponseDTO findUserByDocumentNumber(String documentNumber);
 
-    void updateEmail(Long userId, UpdateEmailDTO dto);
+    UserResponseDTO updateEmail(Long userId, UpdateEmailDTO dto);
 
-    void updatePhoneNumber(Long userId, UpdatePhoneNumberDTO dto);
+    UserResponseDTO updatePhoneNumber(Long userId, UpdatePhoneNumberDTO dto);
 
-    void updatePassword(Long userId, UpdatePasswordDTO dto);
+    UserResponseDTO updatePassword(Long userId, UpdatePasswordDTO dto);
 
     void deleteUser(Long id);
 }
