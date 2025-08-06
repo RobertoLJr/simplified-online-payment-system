@@ -1,4 +1,4 @@
-package com.robertoljr.sops.exception;
+package com.robertoljr.sops.exception.user;
 
 public class UserDeletionException extends RuntimeException {
     public UserDeletionException(String message) {

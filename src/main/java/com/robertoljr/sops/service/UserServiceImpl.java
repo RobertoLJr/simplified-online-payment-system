@@ -2,17 +2,17 @@ package com.robertoljr.sops.service;
 
 import com.robertoljr.sops.dto.user.*;
 import com.robertoljr.sops.entity.User;
-import com.robertoljr.sops.exception.UserCreationException;
-import com.robertoljr.sops.exception.UserNotFoundException;
-import com.robertoljr.sops.exception.UserUpdateException;
+import com.robertoljr.sops.exception.user.UserCreationException;
+import com.robertoljr.sops.exception.user.UserNotFoundException;
+import com.robertoljr.sops.exception.user.UserUpdateException;
 import com.robertoljr.sops.mapper.UserMapper;
 import com.robertoljr.sops.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO createUser(UserCreateDTO dto) {
+        logger.info("Creating user with email: {}", dto.getEmail());
+
         try {
             User user = userMapper.toEntity(dto);
             user = userRepository.save(user);
@@ -49,6 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> findAllUsers() {
+        logger.info("Retrieving all users");
+
         return userRepository.findAll().stream()
                 .map(userMapper::toResponseDTO)
                 .toList();
@@ -56,12 +60,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO findUserById(Long id) {
+        logger.info("Retrieving user with id {}", id);
+
         User user = getUserOrThrow(id);
         return userMapper.toResponseDTO(user);
     }
 
     @Override
     public UserResponseDTO findUserByEmail(String email) {
+        logger.info("Retrieving user with email {}", email);
+
         Optional<User> dbUser = userRepository.findByEmail(email);
         return dbUser.map(userMapper::toResponseDTO)
                 .orElseThrow(() -> {
@@ -72,6 +80,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO findUserByDocumentNumber(String documentNumber) {
+        logger.info("Retrieving user with document number {}", documentNumber);
+
         Optional<User> dbUser = userRepository.findByDocumentNumber(documentNumber);
         return dbUser.map(userMapper::toResponseDTO)
                 .orElseThrow(() -> {
@@ -83,6 +93,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO updateEmail(Long userId, UpdateEmailDTO dto) {
+        logger.info("Updating email for user id {}", userId);
+
         User dbUser = getUserOrThrow(userId);
 
         // Check if the current password is correct
@@ -110,6 +122,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO updatePhoneNumber(Long userId, UpdatePhoneNumberDTO dto) {
+        logger.info("Updating phoneNumber for user id {}", userId);
+
         User dbUser = getUserOrThrow(userId);
 
         // Check if the current phone number is the same as the new one
@@ -128,6 +142,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO updatePassword(Long userId, UpdatePasswordDTO dto) {
+        logger.info("Updating password for user id {}", userId);
+
         User dbUser = getUserOrThrow(userId);
         assertPasswordMatches(dbUser.getPassword(), dto.getCurrentPassword());
         dbUser.setPassword(dto.getNewPassword());
@@ -140,6 +156,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
+        logger.info("Deleting user with id {}", id);
+
         User dbUser = getUserOrThrow(id);
 
         logger.info("Deleted user with id {}", id);

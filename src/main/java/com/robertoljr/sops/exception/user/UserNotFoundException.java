@@ -1,4 +1,4 @@
-package com.robertoljr.sops.exception;
+package com.robertoljr.sops.exception.user;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

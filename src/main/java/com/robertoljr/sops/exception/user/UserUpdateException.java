@@ -1,4 +1,4 @@
-package com.robertoljr.sops.exception;
+package com.robertoljr.sops.exception.user;
 
 public class UserUpdateException extends RuntimeException {
     public UserUpdateException(String message) {

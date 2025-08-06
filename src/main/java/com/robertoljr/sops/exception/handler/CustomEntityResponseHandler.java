@@ -1,6 +1,10 @@
 package com.robertoljr.sops.exception.handler;
 
 import com.robertoljr.sops.exception.*;
+import com.robertoljr.sops.exception.user.UserCreationException;
+import com.robertoljr.sops.exception.user.UserDeletionException;
+import com.robertoljr.sops.exception.user.UserNotFoundException;
+import com.robertoljr.sops.exception.user.UserUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
