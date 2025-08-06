@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL       PRIMARY KEY,
+    id              BIGSERIAL PRIMARY KEY,
     legal_name      VARCHAR(100)    NOT NULL,
     document_type   VARCHAR(32)     NOT NULL,
     document_number VARCHAR(32)     NOT NULL UNIQUE,
