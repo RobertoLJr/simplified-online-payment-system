@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS notifications (
     id              BIGSERIAL PRIMARY KEY,
-    user_id         INTEGER NOT NULL,
-    transaction_id  INTEGER,
+    user_id         BIGSERIAL NOT NULL,
+    transaction_id  BIGSERIAL,
     channel         VARCHAR(20) NOT NULL CHECK (channel IN ('EMAIL', 'PHONE')),
     destination     VARCHAR(100) NOT NULL,
     subject         VARCHAR(150),

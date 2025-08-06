@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS transactions (
     id              BIGSERIAL PRIMARY KEY,
-    sender_id       INTEGER         NOT NULL,
-    recipient_id    INTEGER         NOT NULL,
+    sender_id       BIGSERIAL         NOT NULL,
+    recipient_id    BIGSERIAL         NOT NULL,
     amount          NUMERIC(19,2)   NOT NULL CHECK (amount > 0),
     status          VARCHAR(10)     NOT NULL DEFAULT 'PENDING',
     description     TEXT,

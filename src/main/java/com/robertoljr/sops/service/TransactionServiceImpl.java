@@ -1,9 +1,11 @@
 package com.robertoljr.sops.service;
 
 import com.robertoljr.sops.constant.transaction.Status;
+import com.robertoljr.sops.constant.user.UserType;
 import com.robertoljr.sops.dto.transaction.CreateTransactionDTO;
 import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
 import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
+import com.robertoljr.sops.dto.user.UserResponseDTO;
 import com.robertoljr.sops.entity.Transaction;
 import com.robertoljr.sops.exception.transaction.TransactionCreationException;
 import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
@@ -14,24 +16,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final UserService userService;
+    private final RestTemplate restTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper, UserService userService, RestTemplate restTemplate) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
+        this.userService = userService;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -40,8 +50,20 @@ public class TransactionServiceImpl implements TransactionService {
         logger.info("Creating transaction with sender id: {}", dto.getSenderId());
         logger.info("Creating transaction with recipient id: {}", dto.getRecipientId());
 
+        if (!isTransactionValid(dto)) {
+            logger.error("Invalid transaction.");
+            throw new TransactionCreationException("Invalid transaction.");
+        }
+
         try {
             Transaction transaction = transactionMapper.toEntity(dto);
+
+            if (authorizeTransaction(dto)) {
+                transaction.setStatus(Status.SUCCEEDED);
+            } else {
+                transaction.setStatus(Status.FAILED);
+            }
+
             transaction = transactionRepository.save(transaction);
             return transactionMapper.toResponseDTO(transaction);
         } catch (DataIntegrityViolationException ex) {
@@ -149,5 +171,37 @@ public class TransactionServiceImpl implements TransactionService {
                     logger.error("Transaction not found for id: {}", transactionId);
                     return new TransactionNotFoundException("Transaction not found for id: " + transactionId);
                 });
+    }
+
+    private boolean isTransactionValid(CreateTransactionDTO dto) {
+        logger.info("Validating transaction with sender id: {}", dto.getSenderId());
+
+        // Check if the sender and recipient ids are valid
+        UserResponseDTO dbSenderUser = userService.findUserById(dto.getSenderId());
+        UserResponseDTO dbRecipientUser = userService.findUserById(dto.getRecipientId());
+
+        // Check if the sender is MERCHANT -- not allowed to make transfers
+        if (dbSenderUser.userType().equals(UserType.MERCHANT)) {
+            throw new TransactionCreationException("Sender is a MERCHANT -- not allowed to make transfers.");
+        }
+
+        // Check if the sender and recipient ids are the same
+        if (dbSenderUser.id().equals(dbRecipientUser.id())) {
+            throw new TransactionCreationException("Sender and recipient ids are the same.");
+        }
+
+        // Check if the sender has enough balance to make the transfer
+        if (dbSenderUser.balance().compareTo(dto.getAmount()) < 0) {
+            throw new TransactionCreationException("Sender does not have enough balance to make the transfer.");
+        }
+
+        return true;
+    }
+
+    private boolean authorizeTransaction(CreateTransactionDTO dto) {
+        logger.info("Authorizing transaction with sender id: {}", dto.getSenderId());
+
+        ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
+        return authorizationResponse.getStatusCode() == HttpStatus.OK && authorizationResponse.getBody().get("status").equals("success");
     }
 }
