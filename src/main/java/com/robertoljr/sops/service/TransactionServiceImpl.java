@@ -3,9 +3,11 @@ package com.robertoljr.sops.service;
 import com.robertoljr.sops.constant.transaction.Status;
 import com.robertoljr.sops.dto.transaction.CreateTransactionDTO;
 import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
+import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
 import com.robertoljr.sops.entity.Transaction;
 import com.robertoljr.sops.exception.transaction.TransactionCreationException;
 import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
+import com.robertoljr.sops.exception.transaction.TransactionUpdateStatusException;
 import com.robertoljr.sops.mapper.TransactionMapper;
 import com.robertoljr.sops.repository.TransactionRepository;
 import org.slf4j.Logger;
@@ -112,13 +114,22 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public ResponseTransactionDTO updateStatus(Long id, Status status) {
+    public ResponseTransactionDTO updateStatus(Long id, UpdateStatusDTO dto) {
         logger.info("Updating status for transaction id {}", id);
 
-        Transaction transaction = getTransactionOrThrow(id);
-        transaction.setStatus(status);
-        transaction = transactionRepository.save(transaction);
-        return transactionMapper.toResponseDTO(transaction);
+        Status newStatus;
+        try {
+            newStatus = Status.valueOf(dto.getStatus().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            logger.error("Invalid status value: {}", dto.getStatus());
+            throw new TransactionUpdateStatusException("Invalid status value: " + dto.getStatus());
+        }
+
+        Transaction dbTransaction = getTransactionOrThrow(id);
+        dbTransaction.setStatus(newStatus);
+        dbTransaction = transactionRepository.save(dbTransaction);
+        logger.info("Updated status for transaction id {} to {}", id, newStatus);
+        return transactionMapper.toResponseDTO(dbTransaction);
     }
 
     @Override
