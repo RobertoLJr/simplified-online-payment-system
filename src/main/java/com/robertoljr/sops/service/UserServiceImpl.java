@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,6 +45,13 @@ public class UserServiceImpl implements UserService {
             logger.error("Exception:", ex);
             throw new UserCreationException("An unexpected error occurred while creating the user.");
         }
+    }
+
+    @Override
+    public List<UserResponseDTO> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toResponseDTO)
+                .toList();
     }
 
     @Override

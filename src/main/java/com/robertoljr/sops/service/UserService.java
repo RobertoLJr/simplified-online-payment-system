@@ -2,9 +2,13 @@ package com.robertoljr.sops.service;
 
 import com.robertoljr.sops.dto.user.*;
 
+import java.util.List;
+
 public interface UserService {
 
     UserResponseDTO createUser(UserCreateDTO dto);
+
+    List<UserResponseDTO> findAllUsers();
 
     UserResponseDTO findUserById(Long id);
 
