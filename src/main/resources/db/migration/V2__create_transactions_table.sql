@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS transactions (
-    id SERIAL       PRIMARY KEY,
+    id              BIGSERIAL PRIMARY KEY,
     sender_id       INTEGER         NOT NULL,
     recipient_id    INTEGER         NOT NULL,
     amount          NUMERIC(19,2)   NOT NULL CHECK (amount > 0),
