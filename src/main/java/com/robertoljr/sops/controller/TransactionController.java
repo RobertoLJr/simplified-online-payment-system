@@ -63,7 +63,7 @@ public class TransactionController implements TransactionControllerDocs {
         return ResponseEntity.ok(transactionService.findTransactionsByRecipientId(recipientId));
     }
 
-    @GetMapping(value = "/{status}",
+    @GetMapping(value = "/status/{status}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<ResponseTransactionDTO>> findTransactionsByStatus(@PathVariable Status status) {
