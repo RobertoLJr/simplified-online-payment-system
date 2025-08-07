@@ -8,6 +8,7 @@ import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
 import com.robertoljr.sops.dto.user.UserResponseDTO;
 import com.robertoljr.sops.entity.Transaction;
 import com.robertoljr.sops.exception.transaction.TransactionCreationException;
+import com.robertoljr.sops.exception.transaction.TransactionNotAllowedException;
 import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
 import com.robertoljr.sops.exception.transaction.TransactionUpdateStatusException;
 import com.robertoljr.sops.mapper.TransactionMapper;
@@ -52,7 +53,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (!isTransactionValid(dto)) {
             logger.error("Invalid transaction.");
-            throw new TransactionCreationException("Invalid transaction.");
         }
 
         try {
@@ -182,7 +182,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Check if the sender is MERCHANT -- not allowed to make transfers
         if (dbSenderUser.userType().equals(UserType.MERCHANT)) {
-            throw new TransactionCreationException("Sender is a MERCHANT -- not allowed to make transfers.");
+            throw new TransactionNotAllowedException("Sender is a MERCHANT -- not allowed to make transfers.");
         }
 
         // Check if the sender and recipient ids are the same

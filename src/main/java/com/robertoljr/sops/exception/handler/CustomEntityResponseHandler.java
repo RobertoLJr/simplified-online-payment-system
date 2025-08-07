@@ -1,6 +1,10 @@
 package com.robertoljr.sops.exception.handler;
 
 import com.robertoljr.sops.exception.*;
+import com.robertoljr.sops.exception.transaction.TransactionCreationException;
+import com.robertoljr.sops.exception.transaction.TransactionNotAllowedException;
+import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
+import com.robertoljr.sops.exception.transaction.TransactionUpdateStatusException;
 import com.robertoljr.sops.exception.user.UserCreationException;
 import com.robertoljr.sops.exception.user.UserDeletionException;
 import com.robertoljr.sops.exception.user.UserNotFoundException;
@@ -32,6 +36,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    // User exceptions
     @ExceptionHandler(UserCreationException.class)
     public final ResponseEntity<ExceptionResponse> handleUserCreationExceptions(UserCreationException ex, WebRequest request) {
         return buildResponse(ex, request, HttpStatus.BAD_REQUEST);
@@ -49,6 +54,27 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(UserDeletionException.class)
     public final ResponseEntity<ExceptionResponse> handleUserDeletionExceptions(UserDeletionException ex, WebRequest request) {
+        return buildResponse(ex, request, HttpStatus.BAD_REQUEST);
+    }
+
+    // Transaction exceptions
+    @ExceptionHandler(TransactionCreationException.class)
+    public final ResponseEntity<ExceptionResponse> handleTransactionCreationExceptions(TransactionCreationException ex, WebRequest request) {
+        return buildResponse(ex, request, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TransactionNotAllowedException.class)
+    public final ResponseEntity<ExceptionResponse> handleTransactionNotAllowedExceptions(TransactionNotAllowedException ex, WebRequest request) {
+        return buildResponse(ex, request, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleTransactionNotFoundExceptions(TransactionNotFoundException ex, WebRequest request) {
+        return buildResponse(ex, request, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TransactionUpdateStatusException.class)
+    public final ResponseEntity<ExceptionResponse> handleTransactionUpdateStatusExceptions(TransactionUpdateStatusException ex, WebRequest request) {
         return buildResponse(ex, request, HttpStatus.BAD_REQUEST);
     }
 
