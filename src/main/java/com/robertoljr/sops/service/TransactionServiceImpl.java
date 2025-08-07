@@ -16,7 +16,6 @@ import com.robertoljr.sops.mapper.TransactionMapper;
 import com.robertoljr.sops.mapper.UserMapper;
 import com.robertoljr.sops.repository.TransactionRepository;
 import com.robertoljr.sops.repository.UserRepository;
-import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

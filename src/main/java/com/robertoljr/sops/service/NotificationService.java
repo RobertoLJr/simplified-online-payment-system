@@ -28,7 +28,7 @@ public interface NotificationService {
 
     List<NotificationResponseDTO> findNotificationByCreatedAtBetween(Instant start, Instant end);
 
-    NotificationResponseDTO updateStatus(Long id, NotificationUpdateStatusDTO newStatus);
+    NotificationResponseDTO updateStatus(Long id, NotificationUpdateStatusDTO dto);
 
     void deleteNotification(Long id);
 }
