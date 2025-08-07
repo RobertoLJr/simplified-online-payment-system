@@ -50,12 +50,7 @@ public class Notification {
     protected void onCreate() {
         Instant now = Instant.now();
         this.createdAt = now;
-        this.sentAt = now;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.sentAt = Instant.now();
+        this.sentAt = null;
     }
 
     public Notification() {

@@ -65,8 +65,16 @@ public class NotificationServiceImpl implements NotificationService {
             throw new TransactionNotFoundException(String.format("Transaction with id %d not found", dto.transactionId()));
         }
 
+        // Check if the notification service is available
+        boolean isNotificationServiceAvailable = isNotificationServiceAvailable();
+
         Notification notification = notificationMapper.toEntity(dto);
-        notification.setStatus(isNotificationServiceAvailable() ? Status.SENT : Status.FAILED);
+        if (isNotificationServiceAvailable) {
+            notification.setStatus(Status.SENT);
+            notification.setSentAt(Instant.now());
+        } else {
+            notification.setStatus(Status.FAILED);
+        }
         notificationRepository.save(notification);
 
         return notificationMapper.toResponseDTO(notification);
