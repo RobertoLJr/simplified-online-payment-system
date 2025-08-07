@@ -1,7 +1,9 @@
 package com.robertoljr.sops.service;
 
+import com.robertoljr.sops.constant.notification.Channel;
 import com.robertoljr.sops.constant.transaction.Status;
 import com.robertoljr.sops.constant.user.UserType;
+import com.robertoljr.sops.dto.notification.NotificationCreateDTO;
 import com.robertoljr.sops.dto.transaction.CreateTransactionDTO;
 import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
 import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
@@ -42,6 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final UserService userService;
+    private final NotificationService notificationService;
     private final RestTemplate restTemplate;
     private final UserMapper userMapper;
 
@@ -51,12 +54,14 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionRepository transactionRepository,
             TransactionMapper transactionMapper,
             UserService userService,
+            NotificationService notificationService,
             RestTemplate restTemplate,
             UserMapper userMapper) {
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.userService = userService;
+        this.notificationService = notificationService;
         this.restTemplate = restTemplate;
         this.userMapper = userMapper;
     }
@@ -72,6 +77,10 @@ public class TransactionServiceImpl implements TransactionService {
             logger.error("Invalid transaction.");
         }
 
+        // Get the sender and recipient users
+        Optional<User> sender = userRepository.findById(dto.getSenderId());
+        Optional<User> recipient = userRepository.findById(dto.getRecipientId());
+
         // Authorize the transaction
         try {
             Transaction transaction = transactionMapper.toEntity(dto);
@@ -80,10 +89,7 @@ public class TransactionServiceImpl implements TransactionService {
                 logger.info("Transaction authorized.");
                 transaction.setStatus(Status.SUCCEEDED);
 
-                // Update balances
-                Optional<User> sender = userRepository.findById(dto.getSenderId());
-                Optional<User> recipient = userRepository.findById(dto.getRecipientId());
-
+                // Update balances for both users
                 sender.ifPresent(user -> user.setBalance(user.getBalance().subtract(dto.getAmount())));
                 recipient.ifPresent(user -> user.setBalance(user.getBalance().add(dto.getAmount())));
             } else {
@@ -92,6 +98,16 @@ public class TransactionServiceImpl implements TransactionService {
             }
 
             transaction = transactionRepository.save(transaction);
+
+            // Create a default notification for the recipient
+            notificationService.createNotification(new NotificationCreateDTO(
+                    dto.getSenderId(),
+                    transaction.getId(),
+                    Channel.EMAIL,
+                    sender.map(User::getEmail).orElse(null),
+                    "PAYMENT RECEIVED",
+                    sender.get().getLegalName() + " sent you R$" + dto.getAmount()
+            ));
 
             return transactionMapper.toResponseDTO(transaction);
         } catch (DataIntegrityViolationException ex) {
