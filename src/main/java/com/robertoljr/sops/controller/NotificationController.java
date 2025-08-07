@@ -2,11 +2,9 @@ package com.robertoljr.sops.controller;
 
 import com.robertoljr.sops.constant.notification.Status;
 import com.robertoljr.sops.controller.docs.NotificationControllerDocs;
-import com.robertoljr.sops.controller.docs.NotificationControllerDocs;
 import com.robertoljr.sops.dto.notification.NotificationCreateDTO;
 import com.robertoljr.sops.dto.notification.NotificationResponseDTO;
 import com.robertoljr.sops.dto.notification.NotificationUpdateStatusDTO;
-import com.robertoljr.sops.service.NotificationService;
 import com.robertoljr.sops.service.NotificationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +62,7 @@ public class NotificationController implements NotificationControllerDocs {
         return ResponseEntity.ok(notificationService.findNotificationByTransactionId(transactionId));
     }
 
-    @GetMapping(value = "/{status}",
+    @GetMapping(value = "/status/{status}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<NotificationResponseDTO>> findNotificationByStatus(@PathVariable Status status) {
@@ -78,7 +76,7 @@ public class NotificationController implements NotificationControllerDocs {
         return ResponseEntity.ok(notificationService.findNotificationByCreatedAtBetween(start, end));
     }
 
-    @PutMapping(value = "/{id}",
+    @PutMapping(value = "/{id}/status",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override

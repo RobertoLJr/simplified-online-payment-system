@@ -4,9 +4,6 @@ import com.robertoljr.sops.constant.notification.Status;
 import com.robertoljr.sops.dto.notification.NotificationCreateDTO;
 import com.robertoljr.sops.dto.notification.NotificationResponseDTO;
 import com.robertoljr.sops.dto.notification.NotificationUpdateStatusDTO;
-import com.robertoljr.sops.dto.transaction.CreateTransactionDTO;
-import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
-import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,7 +27,7 @@ public interface NotificationControllerDocs {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "201",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -50,7 +47,7 @@ public interface NotificationControllerDocs {
                             content = {
                                     @Content(
                                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                            array = @ArraySchema(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                                            array = @ArraySchema(schema = @Schema(implementation = NotificationResponseDTO.class))
                                     )
                             }),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
@@ -64,12 +61,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Find a notification by ID.",
             description = "Finds a particular notification by its ID.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -82,12 +79,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Find notification by user ID.",
             description = "Finds all notifications sent to the User with the passed in ID.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -100,12 +97,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Find notifications by transaction ID.",
             description = "Finds all notifications related to the transaction with the passed in ID.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -118,12 +115,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Find notifications with a particular status.",
             description = "Finds all notifications with a particular Status.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -136,12 +133,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Find notification between Instants",
             description = "Finds all notifications after a particular Instant and before a particular Instant.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -154,12 +151,12 @@ public interface NotificationControllerDocs {
     @Operation(
             summary = "Update a notification's Status based on its ID.",
             description = "Updates a notification's Status by passing in an ID and a JSON, XML or YML representation of said notification's new Status.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = ResponseTransactionDTO.class))
+                            content = @Content(schema = @Schema(implementation = NotificationResponseDTO.class))
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
@@ -171,7 +168,7 @@ public interface NotificationControllerDocs {
 
     @Operation(summary = "Delete a Notification.",
             description = "Deletes a specific Notification by its ID.",
-            tags = {"Transaction"},
+            tags = {"Notification"},
             responses = {
                     @ApiResponse(
                             description = "No Content",
