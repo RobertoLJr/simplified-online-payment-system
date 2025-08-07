@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring")
 public interface TransactionMapper {
 
     // CreateTransactionDTO -> Transaction
@@ -18,6 +18,8 @@ public interface TransactionMapper {
     Transaction toEntity(CreateTransactionDTO dto);
 
     // Transaction -> ResponseTransactionDTO
+    @Mapping(source = "sender.id", target = "senderId")
+    @Mapping(source = "recipient.id", target = "recipientId")
     ResponseTransactionDTO toResponseDTO(Transaction transaction);
 
     @Named("fromId")
@@ -25,10 +27,8 @@ public interface TransactionMapper {
         if (id == null) {
             return null;
         }
-
         User user = new User();
         user.setId(id);
-
         return user;
     }
 }

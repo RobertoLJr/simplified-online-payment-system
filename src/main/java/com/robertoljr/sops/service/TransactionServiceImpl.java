@@ -58,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             Transaction transaction = transactionMapper.toEntity(dto);
 
-            if (authorizeTransaction(dto)) {
+            if (isTransactionAuthorized(dto)) {
                 transaction.setStatus(Status.SUCCEEDED);
             } else {
                 transaction.setStatus(Status.FAILED);
@@ -198,7 +198,7 @@ public class TransactionServiceImpl implements TransactionService {
         return true;
     }
 
-    private boolean authorizeTransaction(CreateTransactionDTO dto) {
+    private boolean isTransactionAuthorized(CreateTransactionDTO dto) {
         logger.info("Authorizing transaction with sender id: {}", dto.getSenderId());
 
         ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
