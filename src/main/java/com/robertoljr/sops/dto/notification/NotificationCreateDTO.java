@@ -1,14 +1,26 @@
 package com.robertoljr.sops.dto.notification;
 
 import com.robertoljr.sops.constant.notification.Channel;
-import com.robertoljr.sops.constant.notification.Status;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record NotificationCreateDTO(
-    Long userId,
-    Long transactionId,
-    Channel channel,
-    String destination,
-    String subject,
-    String message,
-    Status status
-) {}
+        @NotNull
+        Long userId,
+
+        @NotNull
+        Long transactionId,
+
+        @NotNull
+        Channel channel,
+
+        @NotNull
+        String destination,
+
+        @NotNull
+        String subject,
+
+        @NotBlank
+        String message
+) {
+}
