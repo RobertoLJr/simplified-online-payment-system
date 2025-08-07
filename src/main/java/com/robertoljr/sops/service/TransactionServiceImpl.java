@@ -13,6 +13,7 @@ import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
 import com.robertoljr.sops.exception.transaction.TransactionUpdateStatusException;
 import com.robertoljr.sops.mapper.TransactionMapper;
 import com.robertoljr.sops.repository.TransactionRepository;
+import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
@@ -59,8 +62,10 @@ public class TransactionServiceImpl implements TransactionService {
             Transaction transaction = transactionMapper.toEntity(dto);
 
             if (isTransactionAuthorized(dto)) {
+                logger.info("Transaction authorized.");
                 transaction.setStatus(Status.SUCCEEDED);
             } else {
+                logger.info("Transaction not authorized.");
                 transaction.setStatus(Status.FAILED);
             }
 
@@ -201,7 +206,19 @@ public class TransactionServiceImpl implements TransactionService {
     private boolean isTransactionAuthorized(CreateTransactionDTO dto) {
         logger.info("Authorizing transaction with sender id: {}", dto.getSenderId());
 
-        ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
-        return authorizationResponse.getStatusCode() == HttpStatus.OK && authorizationResponse.getBody().get("status").equals("success");
+        try {
+            ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
+
+            return authorizationResponse.getStatusCode() == HttpStatus.OK && authorizationResponse.getBody().get("status").equals("success");
+        } catch (HttpClientErrorException.Forbidden ex) {
+            logger.error("Forbidden exception: {}", ex.getMessage());
+            return false;
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            logger.error("Exception: {}", ex.getMessage());
+            throw new TransactionCreationException("An unexpected error occurred while authorizing the transaction.");
+        } catch (Exception ex) {
+            logger.error("Exception: ", ex);
+            throw new TransactionCreationException("An unexpected error occurred while authorizing the transaction.");
+        }
     }
 }
