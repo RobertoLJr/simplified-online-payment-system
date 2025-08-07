@@ -63,16 +63,14 @@ public class TransactionController implements TransactionControllerDocs {
         return ResponseEntity.ok(transactionService.findTransactionsByRecipientId(recipientId));
     }
 
-    @PutMapping(value = "/{status}",
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+    @GetMapping(value = "/{status}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<ResponseTransactionDTO>> findTransactionsByStatus(@PathVariable Status status) {
         return ResponseEntity.ok(transactionService.findTransactionsByStatus(status));
     }
 
-    @PutMapping(value = "/after/{start}/before/{end}",
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE},
+    @GetMapping(value = "/after/{start}/before/{end}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_YAML_VALUE})
     @Override
     public ResponseEntity<List<ResponseTransactionDTO>> findTransactionsByCreatedAtBetween(@PathVariable Instant start, @PathVariable Instant end) {
