@@ -2,10 +2,9 @@ package com.robertoljr.sops.dto.user;
 
 import com.robertoljr.sops.constant.user.DocumentType;
 import com.robertoljr.sops.constant.user.UserType;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 
 public class UserCreateDTO {
 
@@ -30,6 +29,9 @@ public class UserCreateDTO {
 
     @NotNull
     private UserType userType;
+
+    @DecimalMin(value = "0.00")
+    private BigDecimal balance;
 
     public UserCreateDTO() {
     }
@@ -90,6 +92,14 @@ public class UserCreateDTO {
         this.userType = userType;
     }
 
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
     @Override
     public String toString() {
         return "UserCreateDTO{" +
@@ -100,6 +110,7 @@ public class UserCreateDTO {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", password='" + password + '\'' +
                 ", userType=" + userType +
+                ", balance=" + balance +
                 '}';
     }
 }

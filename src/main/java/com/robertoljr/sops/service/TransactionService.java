@@ -4,7 +4,6 @@ import com.robertoljr.sops.constant.transaction.Status;
 import com.robertoljr.sops.dto.transaction.CreateTransactionDTO;
 import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
 import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
-import com.robertoljr.sops.dto.user.*;
 
 import java.time.Instant;
 import java.util.List;

@@ -11,9 +11,7 @@ public interface UserMapper {
 
     // UserCreateDTO -> User
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.Instant.now())")
-    @Mapping(target = "updatedAt", expression = "java(java.time.Instant.now())")
-    @Mapping(target = "balance", expression = "java(java.math.BigDecimal.ZERO)")
+    @Mapping(target = "balance", defaultValue = "0.00")
     User toEntity(UserCreateDTO dto);
 
     // User -> UserCreateDTO
