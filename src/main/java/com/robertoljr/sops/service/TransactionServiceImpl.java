@@ -7,12 +7,15 @@ import com.robertoljr.sops.dto.transaction.ResponseTransactionDTO;
 import com.robertoljr.sops.dto.transaction.UpdateStatusDTO;
 import com.robertoljr.sops.dto.user.UserResponseDTO;
 import com.robertoljr.sops.entity.Transaction;
+import com.robertoljr.sops.entity.User;
 import com.robertoljr.sops.exception.transaction.TransactionCreationException;
 import com.robertoljr.sops.exception.transaction.TransactionNotAllowedException;
 import com.robertoljr.sops.exception.transaction.TransactionNotFoundException;
 import com.robertoljr.sops.exception.transaction.TransactionUpdateStatusException;
 import com.robertoljr.sops.mapper.TransactionMapper;
+import com.robertoljr.sops.mapper.UserMapper;
 import com.robertoljr.sops.repository.TransactionRepository;
+import com.robertoljr.sops.repository.UserRepository;
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,23 +32,34 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+    private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
+
+    private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final UserService userService;
     private final RestTemplate restTemplate;
-
-    private final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
+    private final UserMapper userMapper;
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper, UserService userService, RestTemplate restTemplate) {
+    public TransactionServiceImpl(
+            UserRepository userRepository,
+            TransactionRepository transactionRepository,
+            TransactionMapper transactionMapper,
+            UserService userService,
+            RestTemplate restTemplate,
+            UserMapper userMapper) {
+        this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.userService = userService;
         this.restTemplate = restTemplate;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -54,22 +68,32 @@ public class TransactionServiceImpl implements TransactionService {
         logger.info("Creating transaction with sender id: {}", dto.getSenderId());
         logger.info("Creating transaction with recipient id: {}", dto.getRecipientId());
 
+        // Validate the transaction
         if (!isTransactionValid(dto)) {
             logger.error("Invalid transaction.");
         }
 
+        // Authorize the transaction
         try {
             Transaction transaction = transactionMapper.toEntity(dto);
 
             if (isTransactionAuthorized(dto)) {
                 logger.info("Transaction authorized.");
                 transaction.setStatus(Status.SUCCEEDED);
+
+                // Update balances
+                Optional<User> sender = userRepository.findById(dto.getSenderId());
+                Optional<User> recipient = userRepository.findById(dto.getRecipientId());
+
+                sender.ifPresent(user -> user.setBalance(user.getBalance().subtract(dto.getAmount())));
+                recipient.ifPresent(user -> user.setBalance(user.getBalance().add(dto.getAmount())));
             } else {
                 logger.info("Transaction not authorized.");
                 transaction.setStatus(Status.FAILED);
             }
 
             transaction = transactionRepository.save(transaction);
+
             return transactionMapper.toResponseDTO(transaction);
         } catch (DataIntegrityViolationException ex) {
             logger.error("Data integrity violation exception:", ex);
@@ -209,7 +233,7 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
 
-            return authorizationResponse.getStatusCode() == HttpStatus.OK && authorizationResponse.getBody().get("status").equals("success");
+            return authorizationResponse.getStatusCode() == HttpStatus.OK;
         } catch (HttpClientErrorException.Forbidden ex) {
             logger.error("Forbidden exception: {}", ex.getMessage());
             return false;
